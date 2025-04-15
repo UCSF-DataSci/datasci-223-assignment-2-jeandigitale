@@ -78,9 +78,9 @@ DOSAGE_FACTORS = {
 # Medications that use loading doses for first administration
 # BUG: Missing commas between list items
 LOADING_DOSE_MEDICATIONS = [
-    "amiodarone"
-    "lorazepam"
-    "fentynal"
+    "amiodarone",
+    "lorazepam",
+    "fentanyl"
 ]
 
 def load_patient_data(filepath):
@@ -115,20 +115,24 @@ def calculate_dosage(patient):
     weight = patient['weight']
     # BUG: No check if 'medication' key exists
     medication = patient['medication'] # This bug is diabolical
-    
+    # Get is_first_dose
+    is_first_dose = patient['is_first_dose']
+
     # Get the medication factor
     # BUG: Adding 's' to medication name, which doesn't match DOSAGE_FACTORS keys
-    factor = DOSAGE_FACTORS.get(medication + 's', 0)
+    # Remove 's'
+    factor = DOSAGE_FACTORS.get(medication, 0)
     
     # Calculate base dosage
     # BUG: Using addition instead of multiplication
-    base_dosage = weight + factor
+    base_dosage = weight * factor
     
     # Determine if loading dose should be applied
     # BUG: No check if 'is_first_dose' key exists
-    is_first_dose = patient.get('is_first_dose', False)
-    loading_dose_applied = False
-    final_dosage = base_dosage
+    # Add if statement
+    if is_first_dose == patient.get('is_first_dose', False):
+        loading_dose_applied = False
+        final_dosage = base_dosage
     
     # Apply loading dose if it's the first dose and the medication uses loading doses
     # BUG: Incorrect condition - should check if medication is in LOADING_DOSE_MEDICATIONS
@@ -145,11 +149,11 @@ def calculate_dosage(patient):
     # Add warnings based on medication
     warnings = []
     # BUG: Typos in medication names
-    if medication == "epinephrin":
+    if medication == "epinephrine":
         warnings.append("Monitor for arrhythmias")
     elif medication == "amiodarone":
         warnings.append("Monitor for hypotension")
-    elif medication == "fentynal":
+    elif medication == "fentanyl":
         warnings.append("Monitor for respiratory depression")
     
     patient_with_dosage['warnings'] = warnings
@@ -189,7 +193,7 @@ def main():
     script_dir = os.path.dirname(os.path.abspath(__file__))
     
     # Construct the path to the data file
-    data_path = os.path.join(script_dir, 'data', 'meds.json')
+    data_path = os.path.join(script_dir, 'data', 'raw', 'meds.json')
     
     # BUG: No error handling for load_patient_data failure
     patients = load_patient_data(data_path)
@@ -214,5 +218,13 @@ def main():
     # Return the results (useful for testing)
     return patients_with_dosages, total_medication
 
+#if __name__ == "__main__":
+#    main()
+
+# Checking the printed output
 if __name__ == "__main__":
-    main()
+    patients_with_dosages, total_medication = main()
+    print(patients_with_dosages)  # Now this works
+
+
+
