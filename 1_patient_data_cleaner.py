@@ -40,6 +40,7 @@ Usage:
 
 import json
 import os
+import pandas as pd
 
 def load_patient_data(filepath):
     """
@@ -70,22 +71,38 @@ def clean_patient_data(patients):
         list: Cleaned list of patient dictionaries
     """
     cleaned_patients = []
+
+    seen = set()
     
     for patient in patients:
         # BUG: Typo in key 'nage' instead of 'name'
-        patient['nage'] = patient['name'].title()
+        patient['name'] = patient['name'].title()
         
         # BUG: Wrong method name (fill_na vs fillna)
-        patient['age'] = patient['age'].fill_na(0)
-        
+        # Convert age to numeric, allow missing
+        age = pd.to_numeric(patient.get('age'), errors='coerce')
+
+        # Skip if age is missing or under 18
+        if pd.isna(age) or age < 18:
+            continue
+
+        patient['age'] = int(age)  # Cast to int only if valid
+
         # BUG: Wrong method name (drop_duplcates vs drop_duplicates)
-        patient = patient.drop_duplcates()
-        
+        # Can't use drop_duplicates because it's not a dataframe 
+
         # BUG: Wrong comparison operator (= vs ==)
-        if patient['age'] = 18:
+        if patient['age'] == 18:
             # BUG: Logic error - keeps patients under 18 instead of filtering them out
             cleaned_patients.append(patient)
-    
+
+        # Convert patient dict to a tuple of items so it can go in a set
+        patient_tuple = tuple(sorted(patient.items()))
+
+        if patient_tuple not in seen:
+            seen.add(patient_tuple)
+            cleaned_patients.append(patient)
+
     # BUG: Missing return statement for empty list
     if not cleaned_patients:
         return None
