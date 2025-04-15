@@ -79,6 +79,7 @@ def clean_patient_data(patients):
         patient['name'] = patient['name'].title()
         
         # BUG: Wrong method name (fill_na vs fillna)
+        # Couldn't use fillna because it wasn't a dataframe
         # Convert age to numeric, allow missing
         age = pd.to_numeric(patient.get('age'), errors='coerce')
 
@@ -97,6 +98,7 @@ def clean_patient_data(patients):
             cleaned_patients.append(patient)
 
         # Convert patient dict to a tuple of items so it can go in a set
+        # Identified if it was a duplicate and appended if not
         patient_tuple = tuple(sorted(patient.items()))
 
         if patient_tuple not in seen:
