@@ -12,6 +12,7 @@ import pytest
 import subprocess
 from pathlib import Path
 
+
 def test_buggy_lines_fixed():
     """Test that the original buggy lines have been fixed."""
     script_path = Path(__file__).parent.parent.parent / "2_med_dosage_calculator.py"
