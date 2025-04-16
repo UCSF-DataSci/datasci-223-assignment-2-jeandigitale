@@ -79,8 +79,7 @@ def clean_patient_data(patients):
         patient['name'] = patient['name'].title()
         
         # BUG: Wrong method name (fill_na vs fillna)
-        # Couldn't use fillna because it wasn't a dataframe
-        # Convert age to numeric, allow missing
+        # FIX: Couldn't use fillna because it wasn't a dataframe, Convert age to numeric, allow missing
         age = pd.to_numeric(patient.get('age'), errors='coerce')
 
         # Skip if age is missing or under 18
@@ -90,9 +89,10 @@ def clean_patient_data(patients):
         patient['age'] = int(age)  # Cast to int only if valid
 
         # BUG: Wrong method name (drop_duplcates vs drop_duplicates)
-        # Can't use drop_duplicates because it's not a dataframe 
+        # FIX: Can't use drop_duplicates because it's not a dataframe 
 
         # BUG: Wrong comparison operator (= vs ==)
+        # FIX: change to ==
         if patient['age'] == 18:
             # BUG: Logic error - keeps patients under 18 instead of filtering them out
             cleaned_patients.append(patient)

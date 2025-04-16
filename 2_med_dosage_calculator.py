@@ -115,21 +115,23 @@ def calculate_dosage(patient):
     weight = patient['weight']
     # BUG: No check if 'medication' key exists
     medication = patient['medication'] # This bug is diabolical
-    # Get is_first_dose
+    # BUG: Did not get is_first_dose
+    # FIX: Get is_first_dose
     is_first_dose = patient['is_first_dose']
 
     # Get the medication factor
     # BUG: Adding 's' to medication name, which doesn't match DOSAGE_FACTORS keys
-    # Remove 's'
+    # FIX: Remove 's'
     factor = DOSAGE_FACTORS.get(medication, 0)
     
     # Calculate base dosage
     # BUG: Using addition instead of multiplication
+    # FIX: Multiply
     base_dosage = weight * factor
     
     # Determine if loading dose should be applied
     # BUG: No check if 'is_first_dose' key exists
-    # Add if statement
+    # FIX: Add if statement
     if is_first_dose == patient.get('is_first_dose', False):
         loading_dose_applied = False
         final_dosage = base_dosage
@@ -149,6 +151,7 @@ def calculate_dosage(patient):
     # Add warnings based on medication
     warnings = []
     # BUG: Typos in medication names
+    # FIX: Corrected typos
     if medication == "epinephrine":
         warnings.append("Monitor for arrhythmias")
     elif medication == "amiodarone":
